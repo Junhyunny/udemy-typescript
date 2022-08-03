@@ -28,3 +28,9 @@
     * any kind of value, no specific type assignment
 * Important: It is string and number (etc.), NOT String, Number etc.
 * The core primitive types in TypeScript are all lowercase!
+
+### 2. Literal type
+
+```typescript
+const a = 2.8;
+```
