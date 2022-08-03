@@ -1,9 +1,10 @@
 // automatically type inferrence
-const person = {
-  name: "Junhyunny",
-  age: 30,
-  hobbies: ["Sprots", "Cooking"],
-};
+// const person = {
+//   name: "Junhyunny",
+//   age: 30,
+//   hobbies: ["Sprots", "Cooking"],
+//   role: [2, "author"],
+// };
 
 // object - generic object type
 // const person: object = {
@@ -15,10 +16,18 @@ const person = {
 // const person: {
 //   name: string;
 //   age: number;
+//   hobbies: string[];
+//   role: [number, string];
 // } = {
 //   name: "Junhyunny",
 //   age: 30,
+//   hobbies: ["Sprots", "Cooking"],
+//   role: [2, "author"],
 // };
+// error
+// person.role[1] = 10;
+// person.role = [];
+// person.role = [0, "hello", "world"];
 
 console.log(person);
 // object type에는 name 값이 없으므로 컴파일 에러가 발생
@@ -44,3 +53,11 @@ for (const hobby of person.hobbies) {
   // error cause TypeScript knwows that hobby is strong
   // console.log(hobby.map());
 }
+
+console.log(person.role);
+
+person.role.push("admin");
+console.log(person.role);
+
+person.role[1] = 10;
+console.log(person.role);

@@ -17,5 +17,12 @@
 * array
     * any JavaScript array, type can be flexible or strict
     * [1, 2, 3]
+* tuple
+    * added by typescript: fixed length array
+    * [1, 2] 
+    * [1, "value"]
+* enum
+    * added by typescript: automatically enumerated global constant identifiers
+    * enum {new, old}
 * Important: It is string and number (etc.), NOT String, Number etc.
 * The core primitive types in TypeScript are all lowercase!
