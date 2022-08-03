@@ -24,5 +24,7 @@
 * enum
     * added by typescript: automatically enumerated global constant identifiers
     * enum {new, old}
+* any
+    * any kind of value, no specific type assignment
 * Important: It is string and number (etc.), NOT String, Number etc.
 * The core primitive types in TypeScript are all lowercase!
