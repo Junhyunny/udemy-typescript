@@ -19,7 +19,9 @@ function withTemlate(template: string, hookId: string) {
     // 제네릭 사용
     return function <T extends { new (...args: any[]): { name: string } }>(originalConstructor: T) {
         // 신규 생성자를 만듬
-        // originalConstructor
+        // originalConstructor 클래스를 방지하는 신규 생성자
+        // return (and chaining) a class in a class decorator
+        // 해당 생성자 데코레이터를 사용하는 클래스를 객체로 만드는 시점에 실행된다.
         return class extends originalConstructor {
             constructor(..._: any[]) {
                 super();
@@ -49,6 +51,7 @@ class Person {
     }
 }
 
+// Decorator에서 생성자를 반환하는 경우 객체를 생성하지 않는다면 실행되지 않는다.
 const person = new Person();
 console.log(person);
 
@@ -103,3 +106,33 @@ class Product {
 
 const prod1 = new Product("Book", 19);
 const prod2 = new Product("Cook Book", 32);
+
+// auto bind
+function Autobind(_1: any, _2: string | Symbol, descriptor: PropertyDescriptor) {
+    console.log("Autobind");
+    console.log(descriptor);
+    const originalMethod = descriptor.value;
+    const adjDescriptor: PropertyDescriptor = {
+        configurable: true,
+        enumerable: false,
+        get() {
+            const boundFn = originalMethod.bind(this);
+            return boundFn;
+        },
+    };
+    return adjDescriptor;
+}
+
+class Printer {
+    message = "This works";
+
+    @Autobind
+    showMessage() {
+        console.log(this.message);
+    }
+}
+
+const p = new Printer();
+const button = document.querySelector("button");
+// 여기서도 같은 undefined, context binding 안되는 현상
+button?.addEventListener("click", p.showMessage);
