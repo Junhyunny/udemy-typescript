@@ -16,15 +16,22 @@ function Logger(logString: string) {
 // decorator factory
 function withTemlate(template: string, hookId: string) {
     console.log("TEMPLATE FACTORY");
-    return function (constructor: any) {
-        console.log(template);
-        console.log(hookId);
-        const person = new constructor();
-        const hookEl = document.getElementById(hookId);
-        if (hookEl) {
-            hookEl.innerHTML = template;
-            hookEl.querySelector("h1")!.textContent = person.name;
-        }
+    // 제네릭 사용
+    return function <T extends { new (...args: any[]): { name: string } }>(originalConstructor: T) {
+        // 신규 생성자를 만듬
+        // originalConstructor
+        return class extends originalConstructor {
+            constructor(..._: any[]) {
+                super();
+                console.log("Rendering Template");
+                const person = new originalConstructor();
+                const hookEl = document.getElementById(hookId);
+                if (hookEl) {
+                    hookEl.innerHTML = template;
+                    hookEl.querySelector("h1")!.textContent = person.name;
+                }
+            }
+        };
     };
 }
 
@@ -67,6 +74,7 @@ function Log4(target: any, name: string | Symbol, position: number) {
     console.log(target, name, position);
 }
 
+// decorator는 클래스가 정의될 때 사용된다.
 class Product {
     // property decorator
     @Log
@@ -92,3 +100,6 @@ class Product {
         return this.price * (1 + tax);
     }
 }
+
+const prod1 = new Product("Book", 19);
+const prod2 = new Product("Cook Book", 32);
