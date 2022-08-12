@@ -115,6 +115,7 @@ class ProjectInput {
         if (Array.isArray(userInput)) {
             const [title, description, peopleCount] = userInput;
             console.log(title, description, peopleCount);
+            ProjectState.getInstance().addProject(title, description, peopleCount);
             this.clearInputs();
         }
     }
@@ -130,4 +131,87 @@ class ProjectInput {
     }
 }
 
+class ProjectList {
+    templateElement: HTMLTemplateElement;
+    hostElement: HTMLDivElement;
+    element: HTMLElement;
+    assignedProjects: any;
+
+    constructor(private type: "active" | "finished") {
+        this.templateElement = document.getElementById("project-list") as HTMLTemplateElement;
+        this.hostElement = document.getElementById("app") as HTMLDivElement;
+
+        const importedNode = document.importNode(this.templateElement.content, true);
+        this.element = importedNode.firstElementChild as HTMLElement;
+        this.element.id = `${type}-projects`;
+
+        this.assignedProjects = [];
+
+        ProjectState.getInstance().addListener((projects: any) => {
+            this.assignedProjects = projects;
+            this.renderProjects();
+        });
+
+        this.attach();
+        this.renderContent();
+    }
+
+    private renderProjects() {
+        const listEl = document.getElementById(`${this.type}-projects-list`) as HTMLUListElement;
+        for (const item of this.assignedProjects) {
+            const listItem = document.createElement("li");
+            listItem.textContent = item.title;
+            listEl?.appendChild(listItem);
+        }
+    }
+
+    private attach() {
+        // what is this method
+        this.hostElement.insertAdjacentElement("beforeend", this.element);
+    }
+
+    private renderContent() {
+        const listId = `${this.type}-projects-list`;
+        this.element.querySelector("ul")!.id = listId;
+        this.element.querySelector("h2")!.textContent = this.type.toUpperCase() + " PROJECTS";
+    }
+}
+
+class ProjectState {
+    private listeners: Function[] = [];
+    private projects: any[] = [];
+    private static instance: ProjectState;
+
+    private constructor() {}
+
+    static getInstance() {
+        if (this.instance) {
+            return this.instance;
+        }
+        this.instance = new ProjectState();
+        return this.instance;
+    }
+
+    addListener(listener: Function) {
+        this.listeners.push(listener);
+    }
+
+    addProject(title: string, description: string, people: number) {
+        const project = {
+            id: Math.random().toString(),
+            title,
+            description,
+            people,
+        };
+        this.projects.push(project);
+        // of, in 차이점
+        for (const listenerFunction of this.listeners) {
+            // slice 메소드를 통한 신규 배열 전달
+            listenerFunction(this.projects.slice());
+        }
+    }
+}
+
 const projectInput = new ProjectInput();
+const activeProjectList = new ProjectList("active");
+const finishedProjectList = new ProjectList("finished");
