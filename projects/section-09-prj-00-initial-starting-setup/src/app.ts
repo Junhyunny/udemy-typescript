@@ -135,7 +135,7 @@ class ProjectList {
     templateElement: HTMLTemplateElement;
     hostElement: HTMLDivElement;
     element: HTMLElement;
-    assignedProjects: any;
+    assignedProjects: Project[];
 
     constructor(private type: "active" | "finished") {
         this.templateElement = document.getElementById("project-list") as HTMLTemplateElement;
@@ -147,7 +147,7 @@ class ProjectList {
 
         this.assignedProjects = [];
 
-        ProjectState.getInstance().addListener((projects: any) => {
+        ProjectState.getInstance().addListener((projects: Project[]) => {
             this.assignedProjects = projects;
             this.renderProjects();
         });
@@ -177,9 +177,11 @@ class ProjectList {
     }
 }
 
+type Linstener = (items: Project[]) => void;
+
 class ProjectState {
-    private listeners: Function[] = [];
-    private projects: any[] = [];
+    private listeners: Linstener[] = [];
+    private projects: Project[] = [];
     private static instance: ProjectState;
 
     private constructor() {}
@@ -192,17 +194,18 @@ class ProjectState {
         return this.instance;
     }
 
-    addListener(listener: Function) {
+    addListener(listener: Linstener) {
         this.listeners.push(listener);
     }
 
     addProject(title: string, description: string, people: number) {
-        const project = {
-            id: Math.random().toString(),
+        const project = new Project(
+            Math.random().toString(),
             title,
             description,
             people,
-        };
+            ProjectStatus.Active
+        );
         this.projects.push(project);
         // of, in 차이점
         for (const listenerFunction of this.listeners) {
@@ -210,6 +213,21 @@ class ProjectState {
             listenerFunction(this.projects.slice());
         }
     }
+}
+
+enum ProjectStatus {
+    Active,
+    Finished,
+}
+
+class Project {
+    constructor(
+        public id: string,
+        public title: string,
+        public description: string,
+        public people: number,
+        public status: ProjectStatus
+    ) {}
 }
 
 const projectInput = new ProjectInput();
