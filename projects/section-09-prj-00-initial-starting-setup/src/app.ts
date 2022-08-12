@@ -1,3 +1,33 @@
+interface Validatable {
+    value: string | number;
+    requried?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    min?: number;
+    max?: number;
+}
+
+function validate(validatable: Validatable) {
+    let isValid = true;
+    if (validatable.requried) {
+        isValid = isValid && validatable.value.toString().trim().length !== 0;
+    }
+    if (validatable.minLength != null && typeof validatable.value === "string") {
+        isValid = isValid && validatable.value.toString().trim().length >= validatable.minLength;
+    }
+    // !== , !=  차이 그리고 != null은 undefined도 같이 처리해준다.
+    if (validatable.maxLength != null && typeof validatable.value === "string") {
+        isValid = isValid && validatable.value.toString().trim().length <= validatable.maxLength;
+    }
+    if (validatable.min != null && typeof validatable.value === "number") {
+        isValid = isValid && validatable.value >= validatable.min;
+    }
+    if (validatable.max != null && typeof validatable.value === "number") {
+        isValid = isValid && validatable.value <= validatable.max;
+    }
+    return isValid;
+}
+
 function Autobind(_1: any, _2: string | Symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const adjustDescriptor: PropertyDescriptor = {
@@ -43,7 +73,27 @@ class ProjectInput {
         const title = this.titleInputElement.value;
         const description = this.descriptionInputElement.value;
         const peopleCount = +this.peopleInputElelment.value;
-        if (title.trim().length === 0 || description.trim().length === 0 || peopleCount < 0) {
+
+        const titleValidatable: Validatable = { value: title, requried: true, minLength: 5 };
+        const descriptionValidatable: Validatable = {
+            value: description,
+            requried: true,
+            minLength: 5,
+        };
+        const peopleValidatable: Validatable = {
+            value: peopleCount,
+            requried: true,
+            min: 1,
+            max: 5,
+        };
+
+        if (
+            !(
+                validate(titleValidatable) &&
+                validate(descriptionValidatable) &&
+                validate(peopleValidatable)
+            )
+        ) {
             alert("invalid input, please try again");
             // throw new Error("invalid input, please try again");
             return;
