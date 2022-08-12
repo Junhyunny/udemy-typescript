@@ -1,3 +1,14 @@
+interface Draggable {
+    dragStartHandler(event: DragEvent): void;
+    dragEndHandler(event: DragEvent): void;
+}
+
+interface DragTarget {
+    dragOverHandler(event: DragEvent): void;
+    dropHandler(event: DragEvent): void;
+    dragLeaveHandler(event: DragEvent): void;
+}
+
 interface Validatable {
     value: string | number;
     requried?: boolean;
@@ -74,7 +85,7 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     protected abstract renderContent(): void;
 }
 
-class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements Draggable {
     private project: Project;
 
     get persons(): string {
@@ -89,7 +100,22 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
         this.renderContent();
     }
 
-    protected override configure(): void {}
+    @Autobind
+    dragStartHandler(event: DragEvent): void {
+        console.log("dragstart", event);
+        event.dataTransfer!.setData("text/plain", this.project.id);
+        event.dataTransfer!.effectAllowed = "move";
+    }
+
+    @Autobind
+    dragEndHandler(event: DragEvent): void {
+        console.log("dragend", event);
+    }
+
+    protected override configure(): void {
+        this.element.addEventListener("dragstart", this.dragStartHandler);
+        this.element.addEventListener("dragend", this.dragEndHandler);
+    }
 
     protected override renderContent(): void {
         this.element.querySelector("h2")!.textContent = this.project.title;
@@ -193,7 +219,7 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     // }
 }
 
-class ProjectList extends Component<HTMLDivElement, HTMLElement> {
+class ProjectList extends Component<HTMLDivElement, HTMLElement> implements DragTarget {
     // templateElement: HTMLTemplateElement;
     // hostElement: HTMLDivElement;
     // element: HTMLElement;
@@ -215,6 +241,33 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
         // this.attach();
         this.configure();
         this.renderContent();
+    }
+
+    @Autobind
+    dragOverHandler(event: DragEvent): void | boolean {
+        event.preventDefault();
+        if (event.dataTransfer && event.dataTransfer.types[0] === "text/plain") {
+            const listEl = this.element.querySelector("ul")!;
+            listEl.classList.add("droppable");
+        }
+        return false;
+    }
+
+    @Autobind
+    dropHandler(event: DragEvent): void {
+        console.log("dropHandler");
+        const projectId = event.dataTransfer!.getData("text/plain");
+        ProjectState.getInstance().moveProject(
+            projectId,
+            this.type === "active" ? ProjectStatus.Active : ProjectStatus.Finished
+        );
+    }
+
+    @Autobind
+    dragLeaveHandler(_: DragEvent): void {
+        // console.log("dragLeaveHandler", event);
+        const listEl = this.element.querySelector("ul")!;
+        listEl.classList.remove("droppable");
     }
 
     private renderProjects() {
@@ -244,6 +297,9 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
             this.assignedProjects = relevantProjects;
             this.renderProjects();
         });
+        this.element.addEventListener("dragover", this.dragOverHandler);
+        this.element.addEventListener("dragleave", this.dragLeaveHandler);
+        this.element.addEventListener("drop", this.dropHandler);
     }
 
     protected override renderContent() {
@@ -294,6 +350,18 @@ class ProjectState extends State<Project> {
             ProjectStatus.Active
         );
         this.projects.push(project);
+        this.updateListener();
+    }
+
+    moveProject(projectId: string, newStatus: ProjectStatus) {
+        const project = this.projects.find((prj) => prj.id === projectId);
+        if (project && project.status !== newStatus) {
+            project.status = newStatus;
+        }
+        this.updateListener();
+    }
+
+    private updateListener() {
         // of, in 차이점
         for (const listenerFunction of this.listeners) {
             // slice 메소드를 통한 신규 배열 전달
