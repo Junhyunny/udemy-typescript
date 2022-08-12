@@ -136,3 +136,88 @@ const p = new Printer();
 const button = document.querySelector("button");
 // 여기서도 같은 undefined, context binding 안되는 현상
 button?.addEventListener("click", p.showMessage);
+
+// 이거 다시 확인 필요
+interface ValidatorConfig {
+    // 무슨 형태의 타입이지?
+    [property: string]: {
+        [validatableProp: string]: string[]; // ['requried', 'positive']
+    };
+}
+
+const registeredValidators: ValidatorConfig = {};
+
+function Required(target: any, propertyName: string) {
+    registeredValidators[target.constructor.name] = {
+        ...registeredValidators[target.constructor.name],
+        [propertyName]: ["requried"],
+        // [propertyName]: [
+        //     ...(registeredValidators[target.constructor.name]?.[propertyName] ?? []),
+        //     "required",
+        // ],
+    };
+}
+
+function PositiveNumber(target: any, propertyName: string) {
+    registeredValidators[target.constructor.name] = {
+        ...registeredValidators[target.constructor.name],
+        [propertyName]: ["positive"],
+        // [propertyName]: [
+        //     ...(registeredValidators[target.constructor.name]?.[propertyName] ?? []),
+        //     "positive",
+        // ],
+    };
+}
+
+// any, object 차이
+function validate(obj: any) {
+    const objectValidatorConfig = registeredValidators[obj.constructor.name];
+    if (!objectValidatorConfig) {
+        return true;
+    }
+    console.log(objectValidatorConfig);
+    let isValid = true;
+    for (const prop in objectValidatorConfig) {
+        for (const validator of objectValidatorConfig[prop]) {
+            switch (validator) {
+                case "requried":
+                    isValid = isValid && !!obj[prop];
+                    break;
+                case "positive":
+                    isValid = isValid && obj[prop] > 0;
+                    break;
+            }
+        }
+    }
+    return isValid;
+}
+
+class Course {
+    @Required
+    title: string;
+    @PositiveNumber
+    price: number;
+
+    constructor(t: string, p: number) {
+        this.title = t;
+        this.price = p;
+    }
+}
+
+const courseForm = document.querySelector("form");
+courseForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const titleEl = document.getElementById("title") as HTMLInputElement;
+    const priceEl = document.getElementById("price") as HTMLInputElement;
+
+    const title = titleEl.value;
+    const price = +priceEl.value;
+
+    const createdCourse = new Course(title, price);
+    // add validation
+    if (!validate(createdCourse)) {
+        throw new Error("not validate");
+        return;
+    }
+    console.log(createdCourse);
+});
