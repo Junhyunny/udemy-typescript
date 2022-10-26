@@ -1,7 +1,7 @@
 
 ## 16. Object Types
 
-##### 타입
+##### 기본 타입과 오브젝트 타입
 
 | type | example | description |
 |:---:|:---:|:---:|
