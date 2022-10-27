@@ -15,22 +15,38 @@
 //     age: 30,
 // };
 
-const person: {
-    name: string;
-    age: number;
-    hobbies: string[];
-    role: [number, string]; // tuple
-} = {
+// const person: {
+//     name: string;
+//     age: number;
+//     hobbies: string[];
+//     role: [number, string]; // tuple
+// } = {
+//     name: "Maximilian",
+//     age: 30,
+//     hobbies: ["Sports", "Cooking"],
+//     // if not assigned type
+//     // it would be (string | number) [] - union type
+//     role: [2, "author"],
+// };
+
+// 기본적으로 별도 값을 설정하지 않으면 자동 증가 숫자로 enum 값이 결정된다.
+// 어떠한 값이든 상관 없으므로 필요하다면 값을 할당해서 사용한다.
+// 특정 숫자가 지정되고 이 후에 다른 값을 지정하지 않았다면 자동적으로 증가하는 방식이다.
+enum Role {
+    ADMIN = "ADMIN",
+    READ_ONLY = 10,
+    AUTHOR,
+}
+
+const person = {
     name: "Maximilian",
     age: 30,
     hobbies: ["Sports", "Cooking"],
-    // if not assigned type
-    // it would be (string | number) [] - union type
-    role: [2, "author"],
+    role: Role.ADMIN,
 };
 
 // TypeScript는 push 함수에 대해서 제어하지 못한다.
-person.role.push("admin");
+// person.role.push("admin");
 
 // tuple로 선언하면 두번째 값에 지정된 타입의 값이 들어와야 컴파일 된다.
 // person.role[1] = 10;
@@ -47,8 +63,7 @@ favoriteActivities = ["Sports"];
 
 console.log(person);
 
-// 배열의 타입을 알기 때문에 hobby는 string 처럼 사용할 수 있다.
+// 배열의 타입을 알기 때문에 hobby는 string으로 사용할 수 있고, 자동 완성을 사용 가능하다.
 for (const hobby of person.hobbies) {
-    console.log(hobby);
     console.log(hobby.toUpperCase());
 }
