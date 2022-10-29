@@ -1,31 +1,24 @@
 {
     "compilerOptions": {
-        /* Visit https://aka.ms/tsconfig to read more about this file */
-
-        /* Projects */
-        // "incremental": true,                              /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
-        // "composite": true,                                /* Enable constraints that allow a TypeScript project to be used with project references. */
-        // "tsBuildInfoFile": "./.tsbuildinfo",              /* Specify the path to .tsbuildinfo incremental compilation file. */
-        // "disableSourceOfProjectReferenceRedirect": true,  /* Disable preferring source files instead of declaration files when referencing composite projects. */
-        // "disableSolutionSearching": true,                 /* Opt a project out of multi-project reference checking when editing. */
-        // "disableReferencedProjectLoad": true,             /* Reduce the number of projects loaded automatically by TypeScript. */
-
-        /* Language and Environment */
+        // 브라우저가 지원하는 문법에 맞춰 지정할 수 있다.
+        // 변경되는 것에 따라 컴파일된 JavaScript 코드 모습이 다르다.
         "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-        // "lib": [],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
-        // "jsx": "preserve",                                /* Specify what JSX code is generated. */
-        // "experimentalDecorators": true,                   /* Enable experimental support for TC39 stage 2 draft decorators. */
-        // "emitDecoratorMetadata": true,                    /* Emit design-type metadata for decorated declarations in source files. */
-        // "jsxFactory": "",                                 /* Specify the JSX factory function used when targeting React JSX emit, e.g. 'React.createElement' or 'h'. */
-        // "jsxFragmentFactory": "",                         /* Specify the JSX Fragment reference used for fragments when targeting React JSX emit e.g. 'React.Fragment' or 'Fragment'. */
-        // "jsxImportSource": "",                            /* Specify module specifier used to import the JSX factory functions when using 'jsx: react-jsx*'. */
-        // "reactNamespace": "",                             /* Specify the object invoked for 'createElement'. This only applies when targeting 'react' JSX emit. */
-        // "noLib": true,                                    /* Disable including any library files, including the default lib.d.ts. */
-        // "useDefineForClassFields": true,                  /* Emit ECMAScript-standard-compliant class fields. */
-        // "moduleDetection": "auto",                        /* Control what method is used to detect module-format JS files. */
 
-        /* Modules */
+        // 컴파일에서 사용하는 라이브러리 정의
+        // 빈 배열인 경우 디폴트 값이 없으므로 WebAPI를 사용하려고 할 때 에러가 발생한다.
+
+        // ES5의 기본 값: dom, es5, scripthost
+        // ES6의 기본 값: dom, dom.iterable, es6, scripthost
+
+        // DOM - dom definition like window, document
+        // es6 - ES2015
+        // DOM.Interable -  DOM List 내부적으로 사용하는 Iterable을 정의하기 위한 타입
+        // ScriptHost - APIs for Windows Script Hosting System
+        "lib": ["DOM", "es6", "DOM.Iterable", "ScriptHost"],
+
+        // 모듈을 다루는 문법 -  es6, commonjs 등
         "module": "commonjs" /* Specify what module code is generated. */,
+
         // "rootDir": "./",                                  /* Specify the root folder within your source files. */
         // "moduleResolution": "node",                       /* Specify how TypeScript looks up a file from a given module specifier. */
         // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
@@ -102,10 +95,12 @@
     },
     // 컴파일 대상에서 제거하는 옵션
     // node_modules는 default로 설정되어 있음
-    "exclude": ["**/*.dev.ts", "node_modules"],
+    "exclude": ["**/*.dev.ts", "node_modules"]
     // 컴파일 대상에 추가
     // 하나라도 추가되면 추가되지 않은 파일들은 컴파일 대상에서 제거
-    "include": ["app.ts", "analytics.ts"],
-    // 특정 폴더이나 파일을 지정할 수 있다.
-    "files": ["app.ts"]
+    // 패턴을 이용해 특정 폴더를 지정할 수 있다.
+    // "include": ["app.ts", "analytics.ts"]
+    // 특정 파일을 지정할 수 있다.
+    // "files": ["app.ts"]
+    // include와 files 모두 특정 파일들만 컴파일 대상으로 지정하는데 사용한다.
 }
