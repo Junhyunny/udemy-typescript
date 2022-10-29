@@ -99,5 +99,13 @@
         /* Completeness */
         // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
         "skipLibCheck": true /* Skip type checking all .d.ts files. */
-    }
+    },
+    // 컴파일 대상에서 제거하는 옵션
+    // node_modules는 default로 설정되어 있음
+    "exclude": ["**/*.dev.ts", "node_modules"],
+    // 컴파일 대상에 추가
+    // 하나라도 추가되면 추가되지 않은 파일들은 컴파일 대상에서 제거
+    "include": ["app.ts", "analytics.ts"],
+    // 특정 폴더이나 파일을 지정할 수 있다.
+    "files": ["app.ts"]
 }
