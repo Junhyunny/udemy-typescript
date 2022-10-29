@@ -1,48 +1,37 @@
-// 타입스크립트에 의해 자동적으로 타입이 결정되지만, 명시적으로 지정
-function addTwoNumbers(n1: number, n2: number): number {
-    return n1 + n2;
+// TypeScript에서 새로 생긴 타입
+// 아직 어떤 타입일지 모르기 때문에 unknown 타입이다.
+let userInput: unknown;
+let userName: string;
+let userInputAny: any;
+
+// 숫자나 영문을 할당해도 타입 에러가 발생하지 않는다.
+userInput = 5;
+userInput = "Max";
+
+// 어떤 값을 할당해도 컴파일 에러가 나지 않는 점은 any 타입과 비슷하지만, 다르다.
+// 컴파일 에러 - 특정 타입을 가진 변수에 값 unknown 타입 값 할당이 불가능하다.
+// userName = userInput;
+
+// 컴파일 에러가 발생하지 않는다.
+// unknown 타입인 경우 어떤 값인지 모르기 때문에 컴파일러가 엄격한 타입 확인을 요구한다.
+if (typeof userInput === "string") {
+    userName = userInput;
 }
 
-// 리턴하는 값이 없다면 리턴 타입은 void
-// void는 기본적으로 undefined를 반환한다.
-// 코드에서 아무 값을 반환하지 않았으므로 void를 사용한다.
-// 실재로 반환하는 값을 살펴보면 undefined를 반환한다
-function print(num: number): void {
-    console.log("result: " + num);
+// any 타입인 경우 컴파일 에러가 발생하지 않는다.
+userName = userInputAny;
+
+// 예외를 던지기 때문에 어떤 반환 값도 반환할 수 없으므로 `never` 타입이다.
+// `never`는 어떤 값도 반환할 일이 없음을 의미한다.
+function generateError(message: string, code: number): never {
+    throw {
+        message,
+        errorCode: code,
+    };
 }
 
-// 컴파일 에러
-// function print(num: number): undefined {
-//     console.log("result: " + num);
-// }
+// 반환 값이 없으며 사용할 수 없다.
+const result = generateError("Error Occured", 500);
 
-// return 키워드를 명시적으로 사용하면 결과 타입을 undefined 지정해도 좋다.
-function printAndUndefined(num: number): undefined {
-    console.log("result: " + num);
-    return;
-}
-
-print(addTwoNumbers(5, 12));
-
-// 함수 타입인 경우에는 Function 키워드를 사용한다.
-// Function 타입인 경우 파라미터가 아예 다른 함수를 지정하는 것을 방지하지 못 한다.
-// let combinedValues: Function = addTwoNumbers;
-
-// 파라미터 레이아웃과 리턴 타입을 결정해주면 아예 다른 모습을 가진 함수로 변경할 수 없다.
-let combinedValues: (a: number, b: number) => number = addTwoNumbers;
-
-// 컴파일 에러, 숫자와 함수는 엄연히 다르다.
-// combinedValues = 5;
-
-// 컴파일 에러, 함수의 모습이 다르다.
-// combinedValues = printAndUndefined;
-
-console.log(combinedValues(8, 8));
-
-// 파라미터에 들어오는 함수의 타입에서 파라미터는 엄격하지만, 반환 타입에 대해선 엄격하지 않으므로 컴파일 에러가 나지 않는다.
-function addAndHandle(n1: number, n2: number, callback: (num: number) => void) {
-    const result = n1 + n2;
-    callback(result);
-}
-
-addAndHandle(10, 20, console.log);
+// generateError 함수에서 예외를 던지기 때문에 해당 로직은 실행되지 않는다.
+console.log(result);
