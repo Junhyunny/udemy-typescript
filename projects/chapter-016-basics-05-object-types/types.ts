@@ -19,7 +19,7 @@
 //     name: string;
 //     age: number;
 //     hobbies: string[];
-//     role: [number, string]; // tuple
+//     role: [number, string]; // tuple, 투플
 // } = {
 //     name: "Maximilian",
 //     age: 30,
