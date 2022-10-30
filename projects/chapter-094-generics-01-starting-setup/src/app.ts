@@ -65,3 +65,69 @@ function counterAndDescribe<T extends Lengthy>(element: T): [T, string] {
 console.log(counterAndDescribe("hello world"));
 console.log(counterAndDescribe("Hi there!"));
 console.log(counterAndDescribe(["haha this is array", "generic functin test"]));
+
+// keyof Constraints - T 타입의 key로 사용하는 타입이라는 것을 의미한다.
+function extractAndConvert<T extends object, U extends keyof T>(obj: T, key: U) {
+    return obj[key];
+}
+
+console.log(extractAndConvert({ name: "Jun" }, "name"));
+
+class DataStorage<T extends number | string | boolean> {
+    private data: T[] = [];
+
+    addItem(item: T) {
+        this.data.push(item);
+    }
+
+    removeItem(item: T) {
+        let index = this.data.indexOf(item);
+        if (index < 0) {
+            return;
+        }
+        this.data.splice(index, 1);
+    }
+
+    getItems() {
+        return [...this.data];
+    }
+}
+
+// 문자만 들어가는 Storage 객체
+const textStorage = new DataStorage<string>();
+
+textStorage.addItem("Max");
+textStorage.addItem("Jun");
+textStorage.addItem("Jua");
+
+console.log(textStorage.getItems());
+
+textStorage.removeItem("Jun");
+
+console.log(textStorage.getItems());
+
+// 숫자만 들어가는 Storage 객체
+const numberStorage = new DataStorage<number>();
+
+numberStorage.addItem(1);
+numberStorage.addItem(2);
+numberStorage.addItem(3);
+
+console.log(numberStorage.getItems());
+
+numberStorage.removeItem(3);
+
+console.log(numberStorage.getItems());
+
+// object가 들어가는 Storage 객체 - type safety 제공
+// const objectStorage = new DataStorage<object>();
+
+// objectStorage.addItem({ name: "Max" });
+// objectStorage.addItem({ name: "Manu" });
+
+// console.log(objectStorage.getItems());
+
+// 논리적 오류를 만든다. - 제네릭 클래스 타입에 제약 조건을 만들어 object는 사용하지 못하도록 막는다.
+// objectStorage.removeItem({ name: "Manu" });
+
+// console.log(objectStorage.getItems());
