@@ -1,205 +1,79 @@
-abstract class Department {
-    static fiscalYear = 2022;
+// TypeScript에서만 존재한다.
+// Interface는 컴파일하면 아무 값도 존재하지 않는다.
+// Type check - 필요한 값, 함수들이 있는지 확인한다.
+interface Person {
+    name: string;
+    age: number;
 
-    // properties
-    // vanila JavaScript에서는 private 키워드를 사용하지 않는다.
-    // private id: string;
-    // private name: string;
+    greet(phrase: string): void;
+}
 
-    // private 인 경우 자식 클래스에서 보이지 않는다.
-    // 자식 클래스가 필드에 접근할 수 있도록 protected 접근 제어자를 사용한다.
-    protected employees: string[] = [];
+// interface 를 타입으로 사용한다.
+let user1: Person = {
+    name: "Jun",
+    age: 33,
+    greet(phrase: string) {
+        console.log(phrase + " " + this.name);
+    },
+};
 
-    // 생성자
-    // - 생성자 파라미터에 접근 제어자를 함께 선언하면 클래스 속성으로 함께 생성된다.
-    // - 별도 초기화 로직이 필요 없다.
-    // - 별도 멤버 변수 선언이 필요 없다
-    // readonly 키워드
-    // - TypeScript에서만 사용 가능
-    // - 멤버 변수이며, 변경을 허용하지 않는다.
-    // - 다른 메소드에서 해당 필드의 변경을 만들려는 경우 컴파일 에러가 발생한다.
-    constructor(protected readonly id: string, protected name: string) {
-        // this.id = id;
-        // this.name = name;
+user1.greet("Hello there. I'm ");
 
-        // 컴파일 에러 - static 멤버, 메소드는 this 키워드를 통해 접근할 수 없다.
-        // this.fiscalYear
+// public, private 같은 접근 제어자는 인터페이스에서 사용 불가능
+// readonly는 가능하다.
+// ? 옵셔널(optional) 키워드 - 필수로 값을 가질 필요는 없다.
+// null이나 undefined일 확률이 있으므로 반드시 유효성 확인을 수행해야한다.
+interface Named {
+    readonly name: string;
+    outputName?: string;
+}
 
-        // 클래스를 통해 직접 접근해야 한다.
-        console.log("fiscal year - " + Department.fiscalYear);
+// 인터페이스는 타입에 비해 명확하다.
+// 반드시 구현해야 하는 기능과 필드를 명시한다.
+// 추상 클래스와 다르게 구현체 코드는 존재하지 않는다.
+
+// 인터페이스 확장은 extends 키워드를 통해 가능하다.
+interface Greetable extends Named {
+    greet(phrase: string): void;
+}
+
+// 인터페이스를 확장한다.
+class Man implements Greetable {
+    name: string;
+    outputName?: string;
+
+    constructor(name: string, outputName?: string) {
+        this.name = name;
+        this.outputName = outputName;
     }
 
-    static createEmployee(name: string) {
-        return { name };
-    }
-
-    // this 키워드를 파라미터로 설정할 수 있다.
-    // 이 메소드를 호출하는 객체가 해당 클래스의 정보들을 모두 가지고 있지 않은 경우 컴파일 에러를 발생시킨다.
-    // describe(this: Department) {
-    //     console.log(`Department(${this.id}): ${this.name}`);
-    // }
-
-    // 추상 메소드 - abstract 키워드를 통해 정의한다.
-    // 내부 구현 코드는 없고 하위 클래스들이 재정의 받아야 한다.
-    // 추상 메소드는 추상 클래스 내부에만 존재한다.
-    abstract describe(): void;
-
-    addEmployee(employee: string) {
-        // etc validation logic in here
-        this.employees.push(employee);
-    }
-
-    printEmployeeInformation() {
-        console.log(this.employees.length);
-        console.log(this.employees);
+    greet(phrase: string): void {
+        console.log(phrase + " " + this.name + " " + this.outputName);
     }
 }
 
-// static 메소드를 사용한 피고용자 생성
-// const employee_1 = Department.createEmployee("Max");
-// console.log(employee_1, Department.fiscalYear);
+const user2: Greetable = new Man("Jua", "Kang");
 
-// const accounting = new Department("A-01", "Accounting");
-// console.log(accounting);
-// accounting.describe();
+// 컴파일 에러 - readonly 속성은 변경할 수 없다
+// user2.name = "Jun";
 
-// 캡슐화 위반 - private 키워드를 통해 캡슐화
-// accounting.employees.push("Hello");
-// accounting.employees[0] = "World";
+user2.greet("Hello there. I'm ");
 
-// accounting.addEmployee("Max");
-// accounting.addEmployee("Jun");
-// accounting.addEmployee("Jua");
-// accounting.printEmployeeInformation();
+// type을 이용한 함수 모습 지정
+type addFunction = (a: number, b: number) => number;
 
-// this 키워드 설명
-// this 키워드는 메소드를 실행하는 실 객체를 의미한다.
-// const accountingCopy = {
-//     name: "Human Resources",
-//     describe: accounting.describe,
-// };
+const add: addFunction = (n1: number, n2: number) => {
+    return n1 + n2;
+};
 
-// Haman Resources가 이름으로 출력된다.
-// accountingCopy.describe();
-
-// 상속
-class InfraDepartment extends Department {
-    // 접근 제어자를 통한 필드 생성과 필드 초기화
-    constructor(id: string, public admins: string[]) {
-        // 부모 클래스 생성자
-        super(id, "Infra");
-    }
-
-    override describe(): void {
-        console.log(`${this.name} Department(${this.id})`);
-    }
+// 인터페이스를 이용한 함수 모습 지정
+interface AddInterface {
+    (a: number, b: number): number;
 }
 
-console.log("=============================================");
+const addInstance: AddInterface = (n1: number, n2: number) => {
+    return n1 + n2;
+};
 
-const infra = new InfraDepartment("IT-01", ["Jun", "Jua"]);
-infra.describe();
-
-infra.addEmployee("Max");
-infra.addEmployee("Manu");
-infra.addEmployee("Jun");
-infra.addEmployee("Jua");
-infra.printEmployeeInformation();
-
-console.log("=============================================");
-
-// 상속
-class AccountingDepartment extends Department {
-    private static instance: AccountingDepartment;
-    private lastReport: string;
-
-    static getInstance() {
-        if (AccountingDepartment.instance) {
-            return this.instance;
-        }
-        this.instance = new AccountingDepartment("A-00", []);
-        return this.instance;
-    }
-
-    // getter
-    // public 접근 제어자가 아닌 경우 이를 사용할 수 있도록 getter 메소드 제공
-    get mostRecentReport(): string {
-        if (this.lastReport) {
-            return this.lastReport;
-        }
-        throw new Error("No report found");
-    }
-
-    // setter
-    // public 접근 제어자가 아닌 경우 이를 변경할 수 있도록 setter 메소드 제공
-    set mostRecentReport(report: string) {
-        if (!report) {
-            throw new Error("Please pass in a valid value");
-        }
-        this.addReport(report);
-    }
-
-    private constructor(id: string, private reports: string[]) {
-        super(id, "Accounting");
-        this.lastReport = reports[reports.length - 1];
-    }
-
-    override describe(): void {
-        console.log(`${this.name} Department(${this.id})`);
-    }
-
-    addReport(text: string) {
-        this.reports.push(text);
-        this.lastReport = text;
-    }
-
-    printReports() {
-        console.log(this.reports);
-    }
-
-    // 함수 오버라이딩
-    override addEmployee(employee: string): void {
-        if (employee === "Max") {
-            return;
-        }
-        this.employees.push(employee);
-    }
-}
-
-console.log("=============================================");
-
-// singleton pattern 사용
-const accountingDept = AccountingDepartment.getInstance();
-const accountingDept_2 = AccountingDepartment.getInstance();
-
-console.log(accountingDept == accountingDept_2);
-
-// const accountingDept = new AccountingDepartment("A-01", [
-//     "Something went wrong",
-//     "TypeScript covers type-safety",
-// ]);
-
-// 함수 오버라이딩
-accountingDept.describe();
-
-// overriding 한 메소드에 의해 Max는 포함되지 않는다.
-accountingDept.addEmployee("Max");
-// 나머지 값들은 정상적으로 추가된다.
-accountingDept.addEmployee("Manu");
-accountingDept.addEmployee("Jun");
-accountingDept.addEmployee("Jua");
-accountingDept.printEmployeeInformation();
-
-accountingDept.addReport("This is TypeScript Bible");
-accountingDept.printReports();
-
-// getter 는 메소드 형태이지만, 함수처럼 호출해서 사용하지 않는다.
-console.log(accountingDept.mostRecentReport);
-
-// stter 는 메소드 형태이지만, 함수처럼 호출해서 사용하지 않는다.
-accountingDept.mostRecentReport = "Hello World";
-console.log(accountingDept.mostRecentReport);
-
-accountingDept.printReports();
-
-console.log("=============================================");
+console.log(add(5, 3));
+console.log(addInstance(5, 3));
