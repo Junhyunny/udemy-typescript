@@ -131,3 +131,29 @@ console.log(numberStorage.getItems());
 // objectStorage.removeItem({ name: "Manu" });
 
 // console.log(objectStorage.getItems());
+
+interface CourseGoal {
+    title: string;
+    description: string;
+    completeUntil: Date;
+}
+
+function createCourseGoal(title: string, description: string, date: Date): CourseGoal {
+    // 컴파일 에러가 발생한다.
+    // 타입은 지정되어 있지만 초기화에 필요한 데이터가 모두 설정되지 않았기 때문이다.
+    // let courseGoal: CourseGoal = {};
+
+    // Partial 클래스를 사용하면 모든 값을 초기화하지 않아도 사용할 수 있다.
+    let courseGoal: Partial<CourseGoal> = {};
+    courseGoal.title = title;
+    courseGoal.description = description;
+    courseGoal.completeUntil = date;
+    return courseGoal as CourseGoal;
+}
+
+const someNames: Readonly<string[]> = ["Max", "Sports"];
+// array에 데이터를 추가, 제거하는 것이 방지된다.
+// Readonly 타입이기 때문이다.
+// someNames.push("Manu");
+// someNames.pop();
+console.log(someNames);
