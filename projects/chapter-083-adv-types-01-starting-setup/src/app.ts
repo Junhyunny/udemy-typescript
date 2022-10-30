@@ -51,6 +51,7 @@ function add(a: Combinable, b: Combinable) {
 }
 
 const result = add("Max", "Schwarz");
+
 console.log(result.split(" "));
 
 type UnknownEmployee = Employee | Admin;
@@ -179,3 +180,30 @@ let errorContainer: ErrorContainer = {
 };
 
 console.log(errorContainer);
+
+// optional chaining
+// 해당 데이터를 백엔드 서비스로부터 전달 받았다고 가정해보자.
+// 어떤 이유에 의해 job 데이터가 오지 않을 수 있다.
+const fetchedUserData = {
+    id: "u1",
+    name: "Max",
+    job: { title: "CEO", description: "My own company" },
+};
+
+// 데이터 존재 여부를 확인하기 위한 코드를 추가하면서 너무 코드가 길어지고 복잡해진다.
+console.log(fetchedUserData && fetchedUserData.job && fetchedUserData.job.title);
+// 이를 해결하기 위해 optional(?) chaining을 사용하자.
+console.log(fetchedUserData?.job?.title);
+
+// nullish coalescing
+// 빈 문자열은 falsy
+const userInput = "";
+
+// || 연산자는 왼쪽이 falsy 값인 경우에 오른쪽 값을 선택한다.
+// const storedData = userInput || "DEFAULT";
+
+// nullish coalescing - null 이거나 undefined 인 경우에만 대체 값을 반환한다.
+// 왼쪽 값이 falsy 값인 빈 문자열(""), 0(숫자)이더라도 해당 값을 그대로 사용한다.
+const storedData = userInput ?? "DEFAULT";
+
+console.log(storedData);
