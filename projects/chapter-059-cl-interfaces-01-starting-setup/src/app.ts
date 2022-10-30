@@ -1,9 +1,14 @@
 class Department {
+    static fiscalYear = 2022;
+
     // properties
     // vanila JavaScript에서는 private 키워드를 사용하지 않는다.
     // private id: string;
     // private name: string;
-    private employees: string[] = [];
+
+    // private 인 경우 자식 클래스에서 보이지 않는다.
+    // 자식 클래스가 필드에 접근할 수 있도록 protected 접근 제어자를 사용한다.
+    protected employees: string[] = [];
 
     // 생성자
     // - 생성자 파라미터에 접근 제어자를 함께 선언하면 클래스 속성으로 함께 생성된다.
@@ -16,6 +21,16 @@ class Department {
     constructor(private readonly id: string, private name: string) {
         // this.id = id;
         // this.name = name;
+
+        // 컴파일 에러 - static 멤버, 메소드는 this 키워드를 통해 접근할 수 없다.
+        // this.fiscalYear
+
+        // 클래스를 통해 직접 접근해야 한다.
+        console.log("fiscal year - " + Department.fiscalYear);
+    }
+
+    static createEmployee(name: string) {
+        return { name };
     }
 
     // this 키워드를 파라미터로 설정할 수 있다.
@@ -35,7 +50,12 @@ class Department {
     }
 }
 
-const accounting = new Department("D1", "Accounting");
+// static 메소드를 사용한 피고용자 생성
+const employee_1 = Department.createEmployee("Max");
+
+console.log(employee_1, Department.fiscalYear);
+
+const accounting = new Department("A-01", "Accounting");
 
 console.log(accounting);
 
@@ -60,3 +80,96 @@ accounting.printEmployeeInformation();
 
 // Haman Resources가 이름으로 출력된다.
 // accountingCopy.describe();
+
+// 상속
+class InfraDepartment extends Department {
+    // 접근 제어자를 통한 필드 생성과 필드 초기화
+    constructor(id: string, public admins: string[]) {
+        // 부모 클래스 생성자
+        super(id, "Infra");
+    }
+}
+
+const infra = new InfraDepartment("IT-01", ["Jun", "Jua"]);
+
+infra.describe();
+
+infra.addEmployee("Max");
+infra.addEmployee("Manu");
+infra.addEmployee("Jun");
+infra.addEmployee("Jua");
+
+infra.printEmployeeInformation();
+
+// 상속
+class AccountingDepartment extends Department {
+    private lastReport: string;
+
+    // getter
+    // public 접근 제어자가 아닌 경우 이를 사용할 수 있도록 getter 메소드 제공
+    get mostRecentReport(): string {
+        if (this.lastReport) {
+            return this.lastReport;
+        }
+        throw new Error("No report found");
+    }
+
+    // setter
+    // public 접근 제어자가 아닌 경우 이를 변경할 수 있도록 setter 메소드 제공
+    set mostRecentReport(report: string) {
+        if (!report) {
+            throw new Error("Please pass in a valid value");
+        }
+        this.addReport(report);
+    }
+
+    constructor(id: string, private reports: string[]) {
+        super(id, "Accounting");
+        this.lastReport = reports[reports.length - 1];
+    }
+
+    addReport(text: string) {
+        this.reports.push(text);
+        this.lastReport = text;
+    }
+
+    printReports() {
+        console.log(this.reports);
+    }
+
+    // 함수 오버라이딩
+    override addEmployee(employee: string): void {
+        if (employee === "Max") {
+            return;
+        }
+        this.employees.push(employee);
+    }
+}
+
+const accountingDept = new AccountingDepartment("A-01", [
+    "Something went wrong",
+    "TypeScript covers type-safety",
+]);
+
+accountingDept.describe();
+
+// overriding 한 메소드에 의해 Max는 포함되지 않는다.
+accountingDept.addEmployee("Max");
+// 나머지 값들은 정상적으로 추가된다.
+accountingDept.addEmployee("Manu");
+accountingDept.addEmployee("Jun");
+accountingDept.addEmployee("Jua");
+
+accountingDept.printEmployeeInformation();
+
+accountingDept.addReport("This is TypeScript Bible");
+accountingDept.printReports();
+
+// getter 는 메소드 형태이지만, 함수처럼 호출해서 사용하지 않는다.
+console.log(accountingDept.mostRecentReport);
+
+// stter 는 메소드 형태이지만, 함수처럼 호출해서 사용하지 않는다.
+accountingDept.mostRecentReport = "Hello World";
+
+console.log(accountingDept.mostRecentReport);
+accountingDept.printReports();
