@@ -34,14 +34,24 @@ let value: Universal;
 // value = true;
 value = 3;
 
-// type guard - 실 객체가 여러 종류일 수 있는 경우 런타임 에러를 방지하기 위한 타입 확인 코드
+// function overloading
+// 재정의하고 싶은 함수 위에 같은 이름의 다른 파라미터를 받는 함수를 정의한다.
+// function add(a: number): number; - 컴파일 에러, b를 옵셔널로 처리하면 컴파일 에러가 안난다.
+function add(a: number, b: number): number;
+function add(a: string, b: string): string;
+function add(a: number, b: string): string;
+function add(a: string, b: number): string;
 function add(a: Combinable, b: Combinable) {
+    // type guard - 실 객체가 여러 종류일 수 있는 경우 런타임 에러를 방지하기 위한 타입 확인 코드
     // type guard - union 된 타입으로 여러 형태를 가질 수 있을 때 값의 타입을 확인하는 코드
     if (typeof a === "string" || typeof b === "string") {
         return a.toString() + b.toString();
     }
     return a + b;
 }
+
+const result = add("Max", "Schwarz");
+console.log(result.split(" "));
 
 type UnknownEmployee = Employee | Admin;
 
@@ -138,3 +148,34 @@ moveAnimal({ type: "bird", flyingSpeed: 10 });
 // ID로 찾는 경우 함수 리턴 타입이 HTMLElement | null
 // 어떤 엘리먼트 타입인지 특정 짓지 못한다.
 const paragraph = document.getElementById("message-output");
+
+// 타입 캐스팅 방법 - 1
+// const userInputElement = <HTMLInputElement>document.getElementById("user-input");
+
+// 타입 캐스팅 방법 - 2
+const userInputElement = document.getElementById("user-input") as HTMLInputElement | null;
+
+if (userInputElement) {
+    userInputElement.value = "Hi there!";
+}
+
+// flexible properties 사용하기
+// 다음 같은 객체를 만들고 싶지만, 어떤 키 값이 들어올지 미정이다.
+// {email: 'Not a valid email', username: 'Must start with a character'}
+
+// 키와 값의 타입만 명확히 지정하고 싶은 경우 사용한다.
+interface ErrorContainer {
+    // index types
+    // key 값에 어떤 값이 들어와도 상관 없지만 string 타입이어야 한다.
+    // value 값에 어떤 값이 들어와도 상관 없지만 string 타입이어야 한다.
+    [prop: string]: string;
+}
+
+let errorContainer: ErrorContainer = {
+    // 컴파일 에러
+    // email: 1,
+    email: "Not a valid email",
+    username: "Must start with a character",
+};
+
+console.log(errorContainer);
